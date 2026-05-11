@@ -1,4 +1,4 @@
-package com.henrique.taskflow.Exceptions;
+package com.henrique.taskflow.exceptions;
 
 public class TaskNotFoundException extends RuntimeException {
     public TaskNotFoundException(Long id) {

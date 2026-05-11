@@ -1,4 +1,4 @@
-package com.henrique.taskflow.DTOs.Response;
+package com.henrique.taskflow.dto.response;
 
 import java.time.LocalDateTime;
 

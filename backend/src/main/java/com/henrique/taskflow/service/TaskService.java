@@ -1,12 +1,12 @@
-package com.henrique.taskflow.Service;
+package com.henrique.taskflow.service;
 
 
-import com.henrique.taskflow.DTOs.Request.TaskRequest;
-import com.henrique.taskflow.DTOs.Response.TaskResponse;
-import com.henrique.taskflow.Exceptions.TaskNotFoundException;
-import com.henrique.taskflow.Mapper.TaskMapper;
-import com.henrique.taskflow.Model.TaskModel;
-import com.henrique.taskflow.Repository.TaskRepository;
+import com.henrique.taskflow.dto.request.TaskRequest;
+import com.henrique.taskflow.dto.response.TaskResponse;
+import com.henrique.taskflow.exceptions.TaskNotFoundException;
+import com.henrique.taskflow.mapper.TaskMapper;
+import com.henrique.taskflow.model.TaskModel;
+import com.henrique.taskflow.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

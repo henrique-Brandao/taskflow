@@ -1,10 +1,9 @@
-package com.henrique.taskflow.Model;
+package com.henrique.taskflow.model;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity

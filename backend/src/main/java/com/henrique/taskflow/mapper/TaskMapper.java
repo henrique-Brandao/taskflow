@@ -1,8 +1,8 @@
-package com.henrique.taskflow.Mapper;
+package com.henrique.taskflow.mapper;
 
-import com.henrique.taskflow.DTOs.Request.TaskRequest;
-import com.henrique.taskflow.DTOs.Response.TaskResponse;
-import com.henrique.taskflow.Model.TaskModel;
+import com.henrique.taskflow.dto.request.TaskRequest;
+import com.henrique.taskflow.dto.response.TaskResponse;
+import com.henrique.taskflow.model.TaskModel;
 
 public class TaskMapper {
     public static TaskModel toEntity(TaskRequest request) {
