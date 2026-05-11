@@ -28,13 +28,11 @@ private final TaskRepository repository;
     }
 
     //READ
-    public List<TaskResponse> ListTasks() {
-        List<TaskResponse> taskList = repository.findAll()
+    public List<TaskResponse> listTasks() {
+    return repository.findAll()
                 .stream()
                 .map(TaskMapper::toResponse)
                 .toList();
-
-        return taskList;
     }
 
     //READ
@@ -55,6 +53,7 @@ private final TaskRepository repository;
     // DELETE
 
     public void deleteTask(Long id) {
+        TaskModel task = repository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
         repository.deleteById(id);
     }
 }
