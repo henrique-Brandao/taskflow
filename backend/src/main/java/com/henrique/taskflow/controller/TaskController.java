@@ -20,22 +20,22 @@ public class TaskController {
         this.service = service;
     }
 
-   @PostMapping("/create")
+   @PostMapping
    public ResponseEntity<TaskResponse> createTask(@RequestBody @Valid TaskRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createTask(request));
    }
 
-    @GetMapping("/list")
+    @GetMapping
     public ResponseEntity<List<TaskResponse>> getTasks() {
         return ResponseEntity.ok(service.listTasks());
     }
 
-    @GetMapping("/list/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findTaskById(id));
     }
 
-    @PatchMapping("/edit/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<TaskResponse> editTask(
             @PathVariable Long id,
             @RequestBody @Valid TaskRequest request
