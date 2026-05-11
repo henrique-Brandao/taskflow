@@ -1,4 +1,4 @@
-package Model;
+package com.henrique.taskflow.Model;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;

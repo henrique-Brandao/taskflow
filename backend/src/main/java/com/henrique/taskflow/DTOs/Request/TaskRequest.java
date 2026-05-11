@@ -1,4 +1,4 @@
-package DTOs.Request;
+package com.henrique.taskflow.DTOs.Request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

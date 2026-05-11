@@ -1,6 +1,6 @@
-package Repository;
+package com.henrique.taskflow.Repository;
 
-import Model.TaskModel;
+import com.henrique.taskflow.Model.TaskModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
