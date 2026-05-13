@@ -1,6 +1,7 @@
 package com.henrique.taskflow.mapper;
 
 import com.henrique.taskflow.dto.request.TaskRequest;
+import com.henrique.taskflow.dto.request.TaskUpdateRequest;
 import com.henrique.taskflow.dto.response.TaskResponse;
 import com.henrique.taskflow.model.TaskModel;
 
@@ -25,8 +26,9 @@ public class TaskMapper {
         return taskResponse;
     }
 
-    public static void updateEntity(TaskModel entity, TaskRequest request) {
+    public static void updateEntity(TaskModel entity, TaskUpdateRequest request) {
         if(request.title() != null && request.title().isBlank()) entity.setTitle(request.title());
         if(request.description() != null) entity.setDescription(request.description());
+        if(request.completed() != null) entity.setCompleted(request.completed());
     }
 }

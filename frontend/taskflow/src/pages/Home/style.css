@@ -1,8 +1,14 @@
 .container {
     display: flex;
     align-items: center;
-    flex-direction: column;
+    justify-content: space-evenly;
     padding-top: 100px;
+
+    & .tasklist {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 
 h1 {
@@ -57,6 +63,13 @@ h1 {
     padding: 10px;
     width: 400px;
     border-radius: 10px;
+    
+    & .taskInfo {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
 
     & p {
         color: #fff;
@@ -67,18 +80,42 @@ h1 {
         font-weight: normal
     }
 
-    ;
+    & .situation.done {
+        color: #66e96a;
+        font-weight: bold;
+    }
+
+    & .situation.pending {
+        color: #fca625;
+        font-weight: bold;
+    }
 
     & button {
         background-color: transparent;
         border: none;
         cursor: pointer;
         transition: ease-in-out 0.1s;
+        padding: 5px;
+        border-radius: 10px;
 
     }
 
     & button:hover {
         transform: scale(1.1);
         opacity: 0.4;
+    }
+}
+
+
+.situationContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    & button {
+        background-color: #8B8AE1;
+        border: none;
+        cursor: pointer;
+        transition: ease-in-out 0.1s;
     }
 }

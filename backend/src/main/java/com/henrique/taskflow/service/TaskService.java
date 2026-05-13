@@ -2,6 +2,7 @@ package com.henrique.taskflow.service;
 
 
 import com.henrique.taskflow.dto.request.TaskRequest;
+import com.henrique.taskflow.dto.request.TaskUpdateRequest;
 import com.henrique.taskflow.dto.response.TaskResponse;
 import com.henrique.taskflow.exceptions.TaskNotFoundException;
 import com.henrique.taskflow.mapper.TaskMapper;
@@ -44,7 +45,7 @@ private final TaskRepository repository;
 
     // UPDATE
 
-    public TaskResponse updateTask(TaskRequest request, Long id) {
+    public TaskResponse updateTask(TaskUpdateRequest request, Long id) {
         TaskModel taskModel = repository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
         TaskMapper.updateEntity(taskModel, request);
         TaskModel updatedTask = repository.save(taskModel);

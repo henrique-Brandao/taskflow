@@ -1,6 +1,7 @@
 package com.henrique.taskflow.controller;
 
 import com.henrique.taskflow.dto.request.TaskRequest;
+import com.henrique.taskflow.dto.request.TaskUpdateRequest;
 import com.henrique.taskflow.dto.response.TaskResponse;
 import com.henrique.taskflow.service.TaskService;
 import jakarta.validation.Valid;
@@ -41,7 +42,7 @@ public class TaskController {
     @PatchMapping("/{id}")
     public ResponseEntity<TaskResponse> editTask(
             @PathVariable Long id,
-            @RequestBody @Valid TaskRequest request
+            @RequestBody @Valid TaskUpdateRequest request
     ) {
         return ResponseEntity.ok(service.updateTask(request, id));
     }
