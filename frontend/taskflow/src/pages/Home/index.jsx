@@ -208,7 +208,7 @@ function Home() {
                     <div className="taskTopline">
                       <h3>{task.title}</h3>
                       <span className={`situation ${task.completed ? 'done' : 'pending'}`}>
-                        {task.completed ? 'Completed' : 'Pending'}
+                        {task.completed ? 'Completed' : 'Incomplete'}
                       </span>
                     </div>
 
