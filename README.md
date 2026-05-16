@@ -7,9 +7,9 @@ TaskFlow is a full-stack task management project built as a learning and portfol
 - Create tasks with title and description
 - List all registered tasks
 - Edit task details
-- Mark tasks as completed or pending
+- Mark tasks as completed or incomplete
 - Delete tasks
-- Display task summary counts for total, completed, and pending tasks
+- Display task summary counts for total, completed, and incomplete tasks
 - Persist data in a PostgreSQL database
 - Database migration with Flyway
 - Basic backend validation and error handling
@@ -35,11 +35,10 @@ TaskFlow is a full-stack task management project built as a learning and portfol
 - JavaScript
 - Axios
 - CSS
-- ESLint
 
 ## Project Status
 
-This project is in development as a learning/portfolio project. The main CRUD flow is implemented, and future improvements can still be added to make it more complete and production-ready.
+This project is currently under development as a learning and portfolio project. The main CRUD flow is implemented, and future improvements can still be added to make it more complete and closer to a real-world application.
 
 ## How to Run the Backend
 
@@ -174,10 +173,6 @@ Taskflow/
 
 Screenshots will be added here.
 
-<!--
-Example:
-![TaskFlow home screen](./screenshots/home.png)
--->
 
 ## What I Learned
 
@@ -191,16 +186,19 @@ Example:
 
 ## Future Improvements
 
-- Add user authentication
+- Add user authentication with Spring Security and JWT
 - Add task due dates and priorities
-- Add filtering and search
-- Improve form validation and user feedback on the frontend
-- Add automated tests for backend services and API endpoints
+- Add filtering and search by task status
+- Add pagination for task listing
+- Improve frontend form validation and user feedback
+- Add backend automated tests for services and API endpoints
 - Add frontend tests
 - Add Docker support for easier local setup
-- Improve API documentation
+- Expand API documentation
 - Deploy the backend and frontend
 
 ## Author
 
-Developed by Henrique as a learning and portfolio project.
+Developed by Henrique Brandão as a learning and portfolio project.
+- GitHub: [henrique-brandao](https://github.com/henrique-brandao)
+- LinkedIn: [Henrique Brandão](https://www.linkedin.com/in/Brandaohenrique)
