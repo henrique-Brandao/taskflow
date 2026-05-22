@@ -6,11 +6,12 @@ import com.henrique.taskflow.dto.request.TaskUpdateRequest;
 import com.henrique.taskflow.dto.response.TaskResponse;
 import com.henrique.taskflow.exceptions.TaskNotFoundException;
 import com.henrique.taskflow.mapper.TaskMapper;
-import com.henrique.taskflow.model.TaskModel;
+import com.henrique.taskflow.model.Task;
 import com.henrique.taskflow.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TaskService {
@@ -25,7 +26,7 @@ private final TaskRepository repository;
 
     // CREATE
     public TaskResponse createTask(TaskRequest taskRequest) {
-        TaskModel newTask = TaskMapper.toEntity(taskRequest);
+        Task newTask = TaskMapper.toEntity(taskRequest);
         return TaskMapper.toResponse(repository.save(newTask));
     }
 
@@ -38,24 +39,24 @@ private final TaskRepository repository;
     }
 
     //READ
-    public TaskResponse findTaskById(Long id) {
-       TaskModel task = repository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+    public TaskResponse findTaskById(UUID id) {
+       Task task = repository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
         return TaskMapper.toResponse(task);
     }
 
     // UPDATE
 
-    public TaskResponse updateTask(TaskUpdateRequest request, Long id) {
-        TaskModel taskModel = repository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        TaskMapper.updateEntity(taskModel, request);
-        TaskModel updatedTask = repository.save(taskModel);
+    public TaskResponse updateTask(TaskUpdateRequest request, UUID id) {
+        Task task = repository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+        TaskMapper.updateEntity(task, request);
+        Task updatedTask = repository.save(task);
         return TaskMapper.toResponse(updatedTask);
     }
 
     // DELETE
 
-    public void deleteTask(Long id) {
-        TaskModel task = repository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+    public void deleteTask(UUID id) {
+        Task task = repository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
         repository.deleteById(id);
     }
 }

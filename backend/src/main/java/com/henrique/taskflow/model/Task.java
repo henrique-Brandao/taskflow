@@ -5,16 +5,17 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "Tasks")
+@Table(name = "tasks")
 @EnableJpaAuditing
-public class TaskModel {
+public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private Long id;
+    private UUID id;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -29,22 +30,27 @@ public class TaskModel {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public TaskModel(Long id, String title, String description, boolean completed, LocalDateTime createdAt) {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser user;
+
+    public Task(UUID id, String title, String description, boolean completed, LocalDateTime createdAt, AppUser user) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.completed = completed;
         this.createdAt = createdAt;
+        this.user = user;
     }
 
-    public TaskModel() {
+    public Task() {
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -78,5 +84,13 @@ public class TaskModel {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public AppUser getUser() {
+        return user;
+    }
+
+    public void setUser(AppUser user) {
+        this.user = user;
     }
 }

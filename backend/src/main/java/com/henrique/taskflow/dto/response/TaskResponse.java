@@ -1,9 +1,10 @@
 package com.henrique.taskflow.dto.response;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record TaskResponse(
-        Long id,
+        UUID id,
         String title,
         String description,
         boolean completed,
