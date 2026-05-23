@@ -21,7 +21,7 @@ public class TokenService {
     public LoginResponse generateToken (AppUser user) {
 
         var now =  Instant.now();
-        var expiresIn = 3600L;
+        var expiresIn = 86400L;
 
         var claims = JwtClaimsSet.builder()
                 .issuer("TaskFlow")

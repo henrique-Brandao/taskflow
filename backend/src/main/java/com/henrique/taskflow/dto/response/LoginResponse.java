@@ -1,6 +1,6 @@
 package com.henrique.taskflow.dto.response;
 
 public record LoginResponse (
-        String acessToken,
+        String accessToken,
         Long expiresIn
 ) {}
