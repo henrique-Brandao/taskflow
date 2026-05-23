@@ -2,8 +2,23 @@ import { useState } from 'react'
 import api, { saveSession } from '../../services/api.js'
 import '../Home/style.css'
 
-function getErrorMessage(error, fallbackMessage) {
-  return error.response?.data?.message || error.response?.data?.error || fallbackMessage
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+function getApiErrorMessage(error, isRegister) {
+  const status = error.response?.status
+  const apiMessage = error.response?.data?.message || error.response?.data?.error
+
+  if (!isRegister && (status === 400 || status === 401 || status === 403)) {
+    return 'Invalid email or password.'
+  }
+
+  if (isRegister && (status === 400 || status === 409)) {
+    return apiMessage || 'This email is already registered.'
+  }
+
+  return apiMessage || (isRegister ? 'Could not create your account. Please try again.' : 'Could not sign in. Please try again.')
 }
 
 function Auth({ mode, onAuthenticated, onNavigate }) {
@@ -11,8 +26,11 @@ function Auth({ mode, onAuthenticated, onNavigate }) {
   const [form, setForm] = useState({
     name: '',
     email: '',
-    password: ''
+    confirmEmail: '',
+    password: '',
+    confirmPassword: ''
   })
+  const [errors, setErrors] = useState({})
   const [message, setMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -22,18 +40,68 @@ function Auth({ mode, onAuthenticated, onNavigate }) {
       ...currentForm,
       [name]: value
     }))
+
+    setErrors(currentErrors => ({
+      ...currentErrors,
+      [name]: ''
+    }))
+    setMessage('')
+  }
+
+  function validateForm() {
+    const nextErrors = {}
+    const email = form.email.trim()
+    const confirmEmail = form.confirmEmail.trim()
+
+    if (isRegister && form.name.trim() === '') {
+      nextErrors.name = 'Name is required.'
+    }
+
+    if (email === '') {
+      nextErrors.email = 'Email is required.'
+    } else if (!isValidEmail(email)) {
+      nextErrors.email = 'Enter a valid email address.'
+    }
+
+    if (isRegister) {
+      if (confirmEmail === '') {
+        nextErrors.confirmEmail = 'Confirm your email.'
+      } else if (email !== confirmEmail) {
+        nextErrors.confirmEmail = 'Email confirmation does not match.'
+      }
+    }
+
+    if (form.password === '') {
+      nextErrors.password = 'Password is required.'
+    }
+
+    if (isRegister) {
+      if (form.confirmPassword === '') {
+        nextErrors.confirmPassword = 'Confirm your password.'
+      } else if (form.password !== form.confirmPassword) {
+        nextErrors.confirmPassword = 'Password confirmation does not match.'
+      }
+    }
+
+    setErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
   }
 
   async function handleSubmit(event) {
     event.preventDefault()
     setMessage('')
+
+    if (!validateForm()) {
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
       if (isRegister) {
         await api.post('/auth/register', {
-          name: form.name,
-          email: form.email,
+          name: form.name.trim(),
+          email: form.email.trim(),
           password: form.password
         })
 
@@ -42,7 +110,7 @@ function Auth({ mode, onAuthenticated, onNavigate }) {
       }
 
       const response = await api.post('/auth/login', {
-        email: form.email,
+        email: form.email.trim(),
         password: form.password
       })
       const accessToken = response.data.accessToken || response.data.acessToken
@@ -54,14 +122,21 @@ function Auth({ mode, onAuthenticated, onNavigate }) {
 
       saveSession({
         accessToken,
-        expiresIn: response.data.expiresIn
+        expiresIn: response.data.expiresIn,
+        user: {
+          email: form.email.trim()
+        }
       })
       onAuthenticated()
     } catch (error) {
-      setMessage(getErrorMessage(error, isRegister ? 'Could not create your account.' : 'Could not sign in.'))
+      setMessage(getApiErrorMessage(error, isRegister))
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  function renderError(fieldName) {
+    return errors[fieldName] ? <span className="fieldError">{errors[fieldName]}</span> : null
   }
 
   return (
@@ -77,7 +152,7 @@ function Auth({ mode, onAuthenticated, onNavigate }) {
       </section>
 
       <section className="authCard">
-        <form className="taskForm authForm" onSubmit={handleSubmit}>
+        <form className="taskForm authForm" onSubmit={handleSubmit} noValidate>
           <div className="formHeader">
             <span>{isRegister ? 'New account' : 'Welcome back'}</span>
             <h2>{isRegister ? 'Create account' : 'Login'}</h2>
@@ -93,8 +168,9 @@ function Auth({ mode, onAuthenticated, onNavigate }) {
                 value={form.name}
                 onChange={handleChange}
                 autoComplete="name"
-                required
+                className={errors.name ? 'inputError' : ''}
               />
+              {renderError('name')}
             </label>
           )}
 
@@ -107,9 +183,26 @@ function Auth({ mode, onAuthenticated, onNavigate }) {
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
-              required
+              className={errors.email ? 'inputError' : ''}
             />
+            {renderError('email')}
           </label>
+
+          {isRegister && (
+            <label>
+              Confirm email
+              <input
+                type="email"
+                name="confirmEmail"
+                placeholder="Repeat your email"
+                value={form.confirmEmail}
+                onChange={handleChange}
+                autoComplete="email"
+                className={errors.confirmEmail ? 'inputError' : ''}
+              />
+              {renderError('confirmEmail')}
+            </label>
+          )}
 
           <label>
             Password
@@ -120,11 +213,28 @@ function Auth({ mode, onAuthenticated, onNavigate }) {
               value={form.password}
               onChange={handleChange}
               autoComplete={isRegister ? 'new-password' : 'current-password'}
-              required
+              className={errors.password ? 'inputError' : ''}
             />
+            {renderError('password')}
           </label>
 
-          {message && <p className="formMessage">{message}</p>}
+          {isRegister && (
+            <label>
+              Confirm password
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Repeat your password"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                autoComplete="new-password"
+                className={errors.confirmPassword ? 'inputError' : ''}
+              />
+              {renderError('confirmPassword')}
+            </label>
+          )}
+
+          {message && <p className="formMessage errorMessage">{message}</p>}
 
           <div className="formActions">
             <button className="primaryButton" type="submit" disabled={isSubmitting}>

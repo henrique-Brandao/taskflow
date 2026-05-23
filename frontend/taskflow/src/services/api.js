@@ -2,6 +2,7 @@ import axios from 'axios'
 
 const ACCESS_TOKEN_KEY = 'taskflow:accessToken'
 const EXPIRES_IN_KEY = 'taskflow:expiresIn'
+const USER_KEY = 'taskflow:user'
 
 const api = axios.create({
     baseURL: 'http://localhost:8080'
@@ -11,17 +12,53 @@ export function getAccessToken() {
     return localStorage.getItem(ACCESS_TOKEN_KEY)
 }
 
-export function saveSession({ accessToken, expiresIn }) {
+function getDisplayNameFromEmail(email) {
+    if (!email) {
+        return 'Signed in user'
+    }
+
+    return email
+        .split('@')[0]
+        .split(/[._-]/)
+        .filter(Boolean)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ') || 'Signed in user'
+}
+
+export function getSavedUser() {
+    const savedUser = localStorage.getItem(USER_KEY)
+
+    if (!savedUser) {
+        return null
+    }
+
+    try {
+        return JSON.parse(savedUser)
+    } catch {
+        localStorage.removeItem(USER_KEY)
+        return null
+    }
+}
+
+export function saveSession({ accessToken, expiresIn, user }) {
     localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
 
     if (expiresIn) {
         localStorage.setItem(EXPIRES_IN_KEY, String(expiresIn))
+    }
+
+    if (user?.email) {
+        localStorage.setItem(USER_KEY, JSON.stringify({
+            name: user.name || getDisplayNameFromEmail(user.email),
+            email: user.email
+        }))
     }
 }
 
 export function clearSession() {
     localStorage.removeItem(ACCESS_TOKEN_KEY)
     localStorage.removeItem(EXPIRES_IN_KEY)
+    localStorage.removeItem(USER_KEY)
 }
 
 api.interceptors.request.use(config => {

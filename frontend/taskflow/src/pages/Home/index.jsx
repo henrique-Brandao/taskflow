@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import './style.css'
 import Trash from '../../assets/trash.svg'
-import api, { clearSession } from '../../services/api.js'
+import api, { clearSession, getSavedUser } from '../../services/api.js'
 
 function formatCreatedAt(dateValue) {
   if (!dateValue) {
@@ -39,10 +39,22 @@ function sortTasks(tasks) {
   })
 }
 
+function getInitials(name) {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part.charAt(0).toUpperCase())
+    .join('') || 'TF'
+}
+
 function Home({ onLogout }) {
   const [tasks, setTasks] = useState([])
   const [editingTask, setEditingTask] = useState(null)
   const [message, setMessage] = useState('')
+  const user = getSavedUser()
+  const userName = user?.name || 'Signed in user'
+  const userEmail = user?.email || 'Authenticated session'
   const completedTasks = tasks.filter(task => task.completed).length
   const sortedTasks = sortTasks(tasks)
 
@@ -195,24 +207,33 @@ function Home({ onLogout }) {
           <p className="subtitle">Organize tasks, track pending work, and keep your day moving smoothly.</p>
         </div>
 
-        <div className="summaryGrid" aria-label="Task summary">
-          <div>
-            <strong>{tasks.length}</strong>
-            <span>Total</span>
+        <div className="heroActions">
+          <div className="summaryGrid" aria-label="Task summary">
+            <div>
+              <strong>{tasks.length}</strong>
+              <span>Total</span>
+            </div>
+            <div>
+              <strong>{completedTasks}</strong>
+              <span>Completed</span>
+            </div>
+            <div>
+              <strong>{tasks.length - completedTasks}</strong>
+              <span>Pending</span>
+            </div>
           </div>
-          <div>
-            <strong>{completedTasks}</strong>
-            <span>Completed</span>
-          </div>
-          <div>
-            <strong>{tasks.length - completedTasks}</strong>
-            <span>Pending</span>
+
+          <div className="accountPanel">
+            <div className="accountAvatar" aria-hidden="true">{getInitials(userName)}</div>
+            <div className="accountInfo">
+              <strong>{userName}</strong>
+              <span>{userEmail}</span>
+            </div>
+            <button type="button" className="logoutButton" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
         </div>
-
-        <button type="button" className="logoutButton" onClick={handleLogout}>
-          Logout
-        </button>
       </section>
 
       <div className="workspace">
@@ -258,8 +279,9 @@ function Home({ onLogout }) {
           <div className="taskListBody">
             {tasks.length === 0 ? (
               <div className="emptyState">
-                <strong>No tasks created</strong>
-                <span>Use the form to add your first task.</span>
+                <div className="emptyIcon" aria-hidden="true"></div>
+                <strong>No tasks yet</strong>
+                <span>Create your first task to start organizing your day.</span>
               </div>
             ) : (
               sortedTasks.map(task => (
