@@ -39,8 +39,12 @@ function sortTasks(tasks) {
   })
 }
 
+function normalizeTasks(data) {
+  return Array.isArray(data) ? data : []
+}
+
 function getInitials(name) {
-  return name
+  return String(name || '')
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
@@ -64,7 +68,12 @@ function Home({ onLogout }) {
   async function getTask() {
     try {
       const response = await api.get('/task')
-      setTasks(response.data)
+      const nextTasks = normalizeTasks(response.data)
+      setTasks(nextTasks)
+
+      if (!Array.isArray(response.data)) {
+        setMessage('Could not read tasks from the server.')
+      }
     } catch (error) {
       if (error.response?.status !== 401) {
         setMessage('Could not load tasks.')
@@ -184,7 +193,12 @@ function Home({ onLogout }) {
     api.get('/task')
       .then(response => {
         if (isMounted) {
-          setTasks(response.data)
+          const nextTasks = normalizeTasks(response.data)
+          setTasks(nextTasks)
+
+          if (!Array.isArray(response.data)) {
+            setMessage('Could not read tasks from the server.')
+          }
         }
       })
       .catch(error => {

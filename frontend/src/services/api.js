@@ -10,7 +10,11 @@ const api = axios.create({
 })
 
 export function getAccessToken() {
-    return localStorage.getItem(ACCESS_TOKEN_KEY)
+    try {
+        return localStorage.getItem(ACCESS_TOKEN_KEY)
+    } catch {
+        return null
+    }
 }
 
 function getDisplayNameFromEmail(email) {
@@ -27,7 +31,13 @@ function getDisplayNameFromEmail(email) {
 }
 
 export function getSavedUser() {
-    const savedUser = localStorage.getItem(USER_KEY)
+    let savedUser
+
+    try {
+        savedUser = localStorage.getItem(USER_KEY)
+    } catch {
+        return null
+    }
 
     if (!savedUser) {
         return null
@@ -42,24 +52,32 @@ export function getSavedUser() {
 }
 
 export function saveSession({ accessToken, expiresIn, user }) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+    try {
+        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
 
-    if (expiresIn) {
-        localStorage.setItem(EXPIRES_IN_KEY, String(expiresIn))
-    }
+        if (expiresIn) {
+            localStorage.setItem(EXPIRES_IN_KEY, String(expiresIn))
+        }
 
-    if (user?.email) {
-        localStorage.setItem(USER_KEY, JSON.stringify({
-            name: user.name || getDisplayNameFromEmail(user.email),
-            email: user.email
-        }))
+        if (user?.email) {
+            localStorage.setItem(USER_KEY, JSON.stringify({
+                name: user.name || getDisplayNameFromEmail(user.email),
+                email: user.email
+            }))
+        }
+    } catch {
+        return
     }
 }
 
 export function clearSession() {
-    localStorage.removeItem(ACCESS_TOKEN_KEY)
-    localStorage.removeItem(EXPIRES_IN_KEY)
-    localStorage.removeItem(USER_KEY)
+    try {
+        localStorage.removeItem(ACCESS_TOKEN_KEY)
+        localStorage.removeItem(EXPIRES_IN_KEY)
+        localStorage.removeItem(USER_KEY)
+    } catch {
+        return
+    }
 }
 
 api.interceptors.request.use(config => {
