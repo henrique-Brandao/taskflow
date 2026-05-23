@@ -129,6 +129,37 @@ The frontend expects the backend to be running at:
 http://localhost:8080
 ```
 
+For production builds, set the frontend API URL with:
+
+```bash
+VITE_API_URL=https://your-backend-url
+```
+
+## Manual Deploy
+
+Recommended setup for a simple manual deploy:
+
+- Backend: Railway
+- Frontend: Vercel
+- Database: Supabase PostgreSQL
+
+Deploy the backend first. After Railway gives you the backend URL, use that URL in Vercel as `VITE_API_URL`.
+
+Backend environment variables:
+
+```text
+DB_URL=your_supabase_jdbc_url
+DB_USERNAME=your_supabase_database_user
+DB_PASSWORD=your_supabase_database_password
+APP_CORS_ALLOWED_ORIGINS=https://your-vercel-app.vercel.app
+```
+
+Frontend environment variable:
+
+```text
+VITE_API_URL=https://your-railway-api-url
+```
+
 ## Folder Structure
 
 ```text
