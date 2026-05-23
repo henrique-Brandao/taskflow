@@ -102,7 +102,7 @@ Main endpoint:
 
 ## How to Run the Frontend
 
-The frontend is located in the `frontend/taskflow` folder.
+The frontend is located in the `frontend` folder.
 
 ### Requirements
 
@@ -112,7 +112,7 @@ The frontend is located in the `frontend/taskflow` folder.
 ### Start the Frontend
 
 ```bash
-cd frontend/taskflow
+cd frontend
 npm install
 npm run dev
 ```
@@ -155,17 +155,16 @@ Taskflow/
 |   +-- mvnw.cmd
 |   +-- pom.xml
 +-- frontend/
-|   +-- taskflow/
-|       +-- public/
-|       +-- src/
-|       |   +-- assets/
-|       |   +-- pages/
-|       |   +-- services/
-|       |   +-- index.css
-|       |   +-- main.jsx
-|       +-- index.html
-|       +-- package.json
-|       +-- vite.config.js
+|   +-- public/
+|   +-- src/
+|   |   +-- assets/
+|   |   +-- pages/
+|   |   +-- services/
+|   |   +-- index.css
+|   |   +-- main.jsx
+|   +-- index.html
+|   +-- package.json
+|   +-- vite.config.js
 +-- README.md
 ```
 
