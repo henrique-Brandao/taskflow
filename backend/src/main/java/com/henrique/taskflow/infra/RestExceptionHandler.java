@@ -1,7 +1,9 @@
 package com.henrique.taskflow.infra;
 
 import com.henrique.taskflow.dto.response.ErrorResponse;
+import com.henrique.taskflow.exceptions.InvalidCredentialsException;
 import com.henrique.taskflow.exceptions.TaskNotFoundException;
+import com.henrique.taskflow.exceptions.UserAlreadyExistsException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -40,5 +42,27 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> userAlreadyExistHandler(UserAlreadyExistsException exception) {
+        ErrorResponse response = new ErrorResponse(
+                exception.getMessage(),
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> invalidCredentialsHandler(InvalidCredentialsException exception) {
+        var response = new ErrorResponse(
+                exception.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 }
