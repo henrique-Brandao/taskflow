@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import './style.css'
 import Trash from '../../assets/trash.svg'
-import api from '../../services/api.js'
+import api, { clearSession } from '../../services/api.js'
 
 function formatCreatedAt(dateValue) {
   if (!dateValue) {
@@ -39,9 +39,10 @@ function sortTasks(tasks) {
   })
 }
 
-function Home() {
+function Home({ onLogout }) {
   const [tasks, setTasks] = useState([])
   const [editingTask, setEditingTask] = useState(null)
+  const [message, setMessage] = useState('')
   const completedTasks = tasks.filter(task => task.completed).length
   const sortedTasks = sortTasks(tasks)
 
@@ -49,22 +50,37 @@ function Home() {
   const inputDescriptionRef = useRef()
 
   async function getTask() {
-    const response = await api.get('/task')
-    setTasks(response.data)
+    try {
+      const response = await api.get('/task')
+      setTasks(response.data)
+    } catch (error) {
+      if (error.response?.status !== 401) {
+        setMessage('Could not load tasks.')
+      }
+    }
   }
 
-  async function createTask() {
+  async function createTask(event) {
+    event.preventDefault()
+
     if (inputTitleRef.current.value.trim() === '' || inputDescriptionRef.current.value.trim() === '') {
       return
     }
 
-    await api.post('/task', {
-      title: inputTitleRef.current.value,
-      description: inputDescriptionRef.current.value
-    })
+    try {
+      await api.post('/task', {
+        title: inputTitleRef.current.value,
+        description: inputDescriptionRef.current.value
+      })
 
-    clearForm()
-    getTask()
+      clearForm()
+      setMessage('')
+      getTask()
+    } catch (error) {
+      if (error.response?.status !== 401) {
+        setMessage('Could not create task.')
+      }
+    }
   }
 
   function clearForm() {
@@ -84,16 +100,24 @@ function Home() {
   }
 
   async function deleteTask(id) {
-    await api.delete(`/task/${id}`)
+    try {
+      await api.delete(`/task/${id}`)
 
-    if (editingTask?.id === id) {
-      cancelEditing()
+      if (editingTask?.id === id) {
+        cancelEditing()
+      }
+
+      setMessage('')
+      getTask()
+    } catch (error) {
+      if (error.response?.status !== 401) {
+        setMessage('Could not delete task.')
+      }
     }
-
-    getTask()
   }
 
-  async function updateTask(id) {
+  async function updateTask(id, event) {
+    event.preventDefault()
     const request = {}
 
     if (inputTitleRef.current.value.trim() !== '') {
@@ -108,28 +132,58 @@ function Home() {
       return
     }
 
-    await api.patch(`/task/${id}`, request)
+    try {
+      await api.patch(`/task/${id}`, request)
 
-    setEditingTask(null)
-    clearForm()
-    getTask()
+      setEditingTask(null)
+      clearForm()
+      setMessage('')
+      getTask()
+    } catch (error) {
+      if (error.response?.status !== 401) {
+        setMessage('Could not update task.')
+      }
+    }
   }
 
   async function toggleCompleted(id, completed) {
-    await api.patch(`/task/${id}`, {
-      completed: !completed
-    })
+    try {
+      await api.patch(`/task/${id}`, {
+        completed: !completed
+      })
 
-    getTask()
+      setMessage('')
+      getTask()
+    } catch (error) {
+      if (error.response?.status !== 401) {
+        setMessage('Could not update task status.')
+      }
+    }
+  }
+
+  function handleLogout() {
+    clearSession()
+    onLogout()
   }
 
   useEffect(() => {
-    async function loadTasks() {
-      const response = await api.get('/task')
-      setTasks(response.data)
-    }
+    let isMounted = true
 
-    loadTasks()
+    api.get('/task')
+      .then(response => {
+        if (isMounted) {
+          setTasks(response.data)
+        }
+      })
+      .catch(error => {
+        if (isMounted && error.response?.status !== 401) {
+          setMessage('Could not load tasks.')
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (
@@ -155,10 +209,14 @@ function Home() {
             <span>Pending</span>
           </div>
         </div>
+
+        <button type="button" className="logoutButton" onClick={handleLogout}>
+          Logout
+        </button>
       </section>
 
       <div className="workspace">
-        <form action="" className="taskForm">
+        <form className="taskForm" onSubmit={editingTask ? event => updateTask(editingTask.id, event) : createTask}>
           <div className="formHeader">
             <span>{editingTask ? 'Editing task' : 'New task'}</span>
             <h2>{editingTask ? 'Update details' : 'Create task'}</h2>
@@ -175,7 +233,7 @@ function Home() {
           </label>
 
           <div className="formActions">
-            <button className="primaryButton" type="button" onClick={editingTask ? () => updateTask(editingTask.id) : createTask}>
+            <button className="primaryButton" type="submit">
               {editingTask ? 'Save changes' : 'Create task'}
             </button>
             {editingTask && (
@@ -194,6 +252,8 @@ function Home() {
             </div>
             <p>{tasks.length} item{tasks.length === 1 ? '' : 's'}</p>
           </div>
+
+          {message && <p className="formMessage">{message}</p>}
 
           <div className="taskListBody">
             {tasks.length === 0 ? (

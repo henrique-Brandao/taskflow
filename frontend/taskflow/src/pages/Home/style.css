@@ -14,6 +14,10 @@
     color: #f8fbff;
 }
 
+.authHero {
+    margin-bottom: 22px;
+}
+
 .eyebrow,
 .formHeader span,
 .listHeader span {
@@ -66,6 +70,26 @@
     margin-top: 8px;
     color: #bfd2ea;
     font-size: 13px;
+}
+
+.logoutButton,
+.linkButton {
+    min-height: 40px;
+    border: 1px solid rgba(191, 210, 234, 0.42);
+    border-radius: 8px;
+    background: rgba(248, 251, 255, 0.1);
+    color: #eaf6ff;
+    cursor: pointer;
+    font-weight: 800;
+    padding: 0 16px;
+    transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+.logoutButton:hover,
+.linkButton:hover {
+    transform: translateY(-2px);
+    border-color: rgba(125, 211, 252, 0.7);
+    background: rgba(14, 165, 233, 0.18);
 }
 
 .workspace {
@@ -132,6 +156,41 @@
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
+.authShell {
+    width: min(560px, 100%);
+}
+
+.authCard {
+    width: 100%;
+}
+
+.authForm {
+    position: static;
+}
+
+.formMessage {
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.45;
+    padding: 10px 12px;
+}
+
+.linkButton {
+    width: 100%;
+    border-color: #c8d6e8;
+    background: #ffffff;
+    color: #1e3a8a;
+}
+
+.linkButton:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+
 .formActions,
 .taskActions {
     display: flex;
@@ -141,6 +200,11 @@
 
 button {
     font: inherit;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.72;
 }
 
 .primaryButton,
@@ -388,6 +452,10 @@ button {
         flex-direction: column;
     }
 
+    .logoutButton {
+        width: fit-content;
+    }
+
     .heroPanel h1 {
         font-size: 40px;
     }
@@ -430,6 +498,10 @@ button {
 
     .summaryGrid {
         grid-template-columns: 1fr;
+    }
+
+    .logoutButton {
+        width: 100%;
     }
 
     .taskForm,
