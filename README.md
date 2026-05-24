@@ -1,26 +1,34 @@
 # TaskFlow
 
-TaskFlow is a full-stack task management project built as a learning and portfolio application. It provides a simple interface to create, list, edit, complete, and delete tasks while practicing a React frontend integrated with a Spring Boot REST API.
+TaskFlow is a full-stack task management application built as a learning and portfolio project. It combines a React/Vite frontend with a Spring Boot REST API, JWT authentication, PostgreSQL persistence, Flyway migrations, and a deployed frontend/backend workflow.
+
+The app lets authenticated users create, list, update, complete, reopen, and delete their own tasks. The frontend also includes a light/dark theme switcher and a local demo mode for previewing the UI without running the backend.
 
 ## Features
 
-- Create tasks with title and description
-- List all registered tasks
-- Edit task details
-- Mark tasks as completed or incomplete
-- Delete tasks
-- Display task summary counts for total, completed, and incomplete tasks
-- Persist data in a PostgreSQL database
-- Database migration with Flyway
-- Basic backend validation and error handling
+- User registration and login
+- JWT-based authentication
+- Protected task routes
+- User-scoped task management
+- Create, list, edit, complete, reopen, and delete tasks
+- Task summary counters for total, completed, and pending tasks
+- Light and dark themes with saved user preference
+- Subtle animated background on the frontend
+- PostgreSQL database persistence
+- Database schema versioning with Flyway
+- Configurable CORS for deployed frontend/backend environments
+- Local frontend demo mode for UI preview
 
-## Technologies Used
+## Tech Stack
 
 ### Backend
 
 - Java 21
-- Spring Boot
+- Spring Boot 4
 - Spring Web MVC
+- Spring Security
+- OAuth2 Resource Server
+- JWT
 - Spring Data JPA
 - PostgreSQL
 - Flyway
@@ -30,205 +38,256 @@ TaskFlow is a full-stack task management project built as a learning and portfol
 
 ### Frontend
 
-- React
-- Vite
+- React 19
+- Vite 8
 - JavaScript
 - Axios
 - CSS
 
-## Project Status
-
-This project is currently under development as a learning and portfolio project. The main CRUD flow is implemented, and future improvements can still be added to make it more complete and closer to a real-world application.
-
-## How to Run the Backend
-
-The backend is located in the `backend` folder.
-
-### Requirements
-
-- Java 21
-- PostgreSQL
-- Maven, or use the included Maven wrapper
-
-### Environment Variables
-
-The backend reads the database connection from environment variables:
-
-```bash
-DB_URL=jdbc:postgresql://localhost:5432/taskflow
-DB_USERNAME=your_postgres_user
-DB_PASSWORD=your_postgres_password
-```
-
-Create a PostgreSQL database before starting the application. Example:
-
-```sql
-CREATE DATABASE taskflow;
-```
-
-### Start the Backend
-
-On Windows PowerShell:
-
-```powershell
-cd backend
-$env:DB_URL="jdbc:postgresql://localhost:5432/taskflow"
-$env:DB_USERNAME="your_postgres_user"
-$env:DB_PASSWORD="your_postgres_password"
-.\mvnw.cmd spring-boot:run
-```
-
-On macOS/Linux:
-
-```bash
-cd backend
-export DB_URL="jdbc:postgresql://localhost:5432/taskflow"
-export DB_USERNAME="your_postgres_user"
-export DB_PASSWORD="your_postgres_password"
-./mvnw spring-boot:run
-```
-
-By default, the API runs at:
-
-```text
-http://localhost:8080
-```
-
-Main endpoint:
-
-```text
-/task
-```
-
-## How to Run the Frontend
-
-The frontend is located in the `frontend` folder.
-
-### Requirements
-
-- Node.js
-- npm
-
-### Start the Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-By default, the Vite development server runs at:
-
-```text
-http://localhost:5173
-```
-
-The frontend expects the backend to be running at:
-
-```text
-http://localhost:8080
-```
-
-For production builds, set the frontend API URL with:
-
-```bash
-VITE_API_URL=https://your-backend-url
-```
-
-## Manual Deploy
-
-Recommended setup for a simple manual deploy:
+### Deployment
 
 - Backend: Railway
 - Frontend: Vercel
 - Database: Supabase PostgreSQL
 
-Deploy the backend first. After Railway gives you the backend URL, use that URL in Vercel as `VITE_API_URL`.
-
-Backend environment variables:
+## Project Structure
 
 ```text
-DB_URL=your_supabase_jdbc_url
-DB_USERNAME=your_supabase_database_user
-DB_PASSWORD=your_supabase_database_password
-APP_CORS_ALLOWED_ORIGINS=https://your-vercel-app.vercel.app
-```
-
-Frontend environment variable:
-
-```text
-VITE_API_URL=https://your-railway-api-url
-```
-
-## Folder Structure
-
-```text
-Taskflow/
+taskflow/
 +-- backend/
-|   +-- .mvn/
-|   +-- src/
-|   |   +-- main/
-|   |   |   +-- java/com/henrique/taskflow/
-|   |   |   |   +-- controller/
-|   |   |   |   +-- dto/
-|   |   |   |   +-- exceptions/
-|   |   |   |   +-- infra/
-|   |   |   |   +-- mapper/
-|   |   |   |   +-- model/
-|   |   |   |   +-- repository/
-|   |   |   |   +-- service/
-|   |   |   |   +-- TaskflowApplication.java
-|   |   |   +-- resources/
-|   |   |       +-- db/migration/
-|   |   |       +-- application.properties
-|   |   +-- test/
+|   +-- src/main/java/com/henrique/taskflow/
+|   |   +-- config/
+|   |   +-- controller/
+|   |   +-- dto/
+|   |   +-- exceptions/
+|   |   +-- infra/
+|   |   +-- mapper/
+|   |   +-- model/
+|   |   +-- repository/
+|   |   +-- service/
+|   |   +-- TaskflowApplication.java
+|   +-- src/main/resources/
+|   |   +-- certs/
+|   |   +-- db/migration/
+|   |   +-- application.properties
+|   +-- pom.xml
 |   +-- mvnw
 |   +-- mvnw.cmd
-|   +-- pom.xml
 +-- frontend/
 |   +-- public/
 |   +-- src/
 |   |   +-- assets/
 |   |   +-- pages/
 |   |   +-- services/
+|   |   +-- App.jsx
 |   |   +-- index.css
 |   |   +-- main.jsx
-|   +-- index.html
 |   +-- package.json
 |   +-- vite.config.js
 +-- README.md
 ```
 
-## Screenshots
+## API Overview
 
-Screenshots will be added here.
+### Authentication
 
+```text
+POST /auth/register
+POST /auth/login
+```
+
+### Tasks
+
+```text
+POST   /task
+GET    /task
+GET    /task/{id}
+PATCH  /task/{id}
+DELETE /task/{id}
+```
+
+Task endpoints require authentication.
+
+## Running Locally
+
+### Requirements
+
+- Java 21
+- Node.js and npm
+- PostgreSQL
+- Maven, or the included Maven wrapper
+
+## Backend Setup
+
+The backend is located in the `backend` folder.
+
+Create a PostgreSQL database:
+
+```sql
+CREATE DATABASE taskflow;
+```
+
+Create `backend/.env` based on `backend/.env.example`:
+
+```env
+DB_URL=jdbc:postgresql://localhost:5432/taskflow
+DB_USERNAME=your_postgres_user
+DB_PASSWORD=your_postgres_password
+APP_CORS_ALLOWED_ORIGINS=http://localhost:5173
+JWT_PUBLIC_KEY_BASE64=base64_of_app_pub
+JWT_PRIVATE_KEY_BASE64=base64_of_app_key
+```
+
+The project also includes local key files under `backend/src/main/resources/certs/`. For deployed environments, the JWT keys can be provided through the base64 environment variables above.
+
+Start the backend:
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+On Windows:
+
+```powershell
+cd backend
+.\mvnw.cmd spring-boot:run
+```
+
+The API runs at:
+
+```text
+http://localhost:8080
+```
+
+## Frontend Setup
+
+The frontend is located in the `frontend` folder.
+
+Install dependencies:
+
+```bash
+cd frontend
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+The frontend runs at:
+
+```text
+http://localhost:5173
+```
+
+### Frontend Environment Variables
+
+To point the frontend to a different backend:
+
+```env
+VITE_API_URL=http://localhost:8080
+```
+
+For production:
+
+```env
+VITE_API_URL=https://your-railway-api-url
+```
+
+### Demo Mode
+
+During local development, the frontend includes a demo mode so the task board can be previewed without running the backend.
+
+Run with demo mode disabled when you want to test the real login/API flow:
+
+```bash
+VITE_DEMO_MODE=false npm run dev
+```
+
+In production builds, demo mode is only enabled if explicitly configured:
+
+```env
+VITE_DEMO_MODE=true
+```
+
+## Deployment Notes
+
+Recommended setup:
+
+- Deploy the backend to Railway.
+- Deploy the frontend to Vercel.
+- Use Supabase PostgreSQL as the production database.
+- Set the Railway backend URL as `VITE_API_URL` in Vercel.
+- Set the Vercel frontend URL as `APP_CORS_ALLOWED_ORIGINS` in Railway.
+
+Backend environment variables:
+
+```env
+DB_URL=your_supabase_jdbc_url
+DB_USERNAME=your_supabase_database_user
+DB_PASSWORD=your_supabase_database_password
+APP_CORS_ALLOWED_ORIGINS=https://your-vercel-app.vercel.app
+JWT_PUBLIC_KEY_BASE64=base64_of_public_key
+JWT_PRIVATE_KEY_BASE64=base64_of_private_key
+```
+
+Frontend environment variables:
+
+```env
+VITE_API_URL=https://your-railway-api-url
+```
+
+## Useful Commands
+
+Backend:
+
+```bash
+cd backend
+./mvnw compile
+./mvnw test
+./mvnw spring-boot:run
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm run dev
+npm run build
+npm run lint
+```
 
 ## What I Learned
 
-- How to structure a Spring Boot REST API using controller, service, repository, DTO, mapper, and model layers
-- How to connect a Java backend to PostgreSQL using Spring Data JPA
-- How to manage database schema changes with Flyway migrations
-- How to validate incoming API data with Jakarta Validation
-- How to consume a REST API from a React application using Axios
-- How to organize a React/Vite frontend with pages, services, assets, and CSS
-- How frontend and backend applications communicate during local development
+- Building a layered Spring Boot REST API with controllers, services, repositories, DTOs, mappers, and models
+- Securing endpoints with Spring Security and JWT
+- Loading application configuration from environment variables for local and deployed environments
+- Connecting Spring Boot to PostgreSQL with Spring Data JPA
+- Managing database migrations with Flyway
+- Handling frontend authentication state and protected UI flows
+- Consuming a backend API from React with Axios
+- Deploying a full-stack project with Vercel, Railway, and Supabase
+- Debugging deployment issues involving CORS, environment variables, and JWT keys
+- Improving UI polish with responsive layouts, theme switching, and animation
 
 ## Future Improvements
 
-- Add user authentication with Spring Security and JWT
+- Add automated backend tests with JUnit 5 and Mockito
+- Add integration tests for authentication and task ownership
+- Add frontend tests
 - Add task due dates and priorities
 - Add filtering and search by task status
-- Add pagination for task listing
-- Improve frontend form validation and user feedback
-- Add backend automated tests for services and API endpoints
-- Add frontend tests
-- Add Docker support for easier local setup
-- Expand API documentation
-- Deploy the backend and frontend
+- Add pagination for larger task lists
+- Integrate TaskFlow with a Discord bot for task notifications and commands
+- Improve API documentation examples
+- Add Docker support for local development
 
 ## Author
 
-Developed by Henrique Brandão as a learning and portfolio project.
+Developed by Henrique Brandao as a learning and portfolio project.
+
 - GitHub: [henrique-brandao](https://github.com/henrique-brandao)
-- LinkedIn: [Henrique Brandão](https://www.linkedin.com/in/Brandaohenrique)
+- LinkedIn: [Henrique Brandao](https://www.linkedin.com/in/Brandaohenrique)
