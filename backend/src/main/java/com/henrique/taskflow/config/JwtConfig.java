@@ -16,12 +16,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.io.InputStream;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
@@ -39,53 +34,30 @@ public class JwtConfig {
     private String privateKeyBase64;
 
     @Bean
-    public JwtDecoder jwtDecoder() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        RSAPublicKey publicKey = getPublicKey();
-        return NimbusJwtDecoder.withPublicKey(publicKey).build();
+    public JwtDecoder jwtDecoder() throws IOException {
+        return NimbusJwtDecoder.withPublicKey(loadPublicKey()).build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        JWK jwk = new RSAKey.Builder(getPublicKey()).privateKey(getPrivateKey()).build();
+    public JwtEncoder jwtEncoder() throws IOException {
+        JWK jwk = new RSAKey.Builder(loadPublicKey()).privateKey(loadPrivateKey()).build();
         var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
 
-    private RSAPublicKey getPublicKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        if (!publicKeyBase64.isBlank()) {
-            byte[] keyBytes = decodeBase64(publicKeyBase64);
+    private RSAPublicKey loadPublicKey() throws IOException {
+        return RsaKeyConverters.x509().convert(openKey(publicKeyResource, publicKeyBase64));
+    }
 
-            if (isPem(keyBytes)) {
-                return RsaKeyConverters.x509().convert(new ByteArrayInputStream(keyBytes));
-            }
+    private RSAPrivateKey loadPrivateKey() throws IOException {
+        return RsaKeyConverters.pkcs8().convert(openKey(privateKeyResource, privateKeyBase64));
+    }
 
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(keyBytes));
+    private InputStream openKey(Resource keyResource, String keyBase64) throws IOException {
+        if (!keyBase64.isBlank()) {
+            return new ByteArrayInputStream(Base64.getMimeDecoder().decode(keyBase64));
         }
 
-        return RsaKeyConverters.x509().convert(publicKeyResource.getInputStream());
-    }
-
-    private RSAPrivateKey getPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        if (!privateKeyBase64.isBlank()) {
-            byte[] keyBytes = decodeBase64(privateKeyBase64);
-
-            if (isPem(keyBytes)) {
-                return RsaKeyConverters.pkcs8().convert(new ByteArrayInputStream(keyBytes));
-            }
-
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return (RSAPrivateKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
-        }
-
-        return RsaKeyConverters.pkcs8().convert(privateKeyResource.getInputStream());
-    }
-
-    private byte[] decodeBase64(String value) {
-        return Base64.getMimeDecoder().decode(value);
-    }
-
-    private boolean isPem(byte[] keyBytes) {
-        return new String(keyBytes, StandardCharsets.UTF_8).contains("-----BEGIN");
+        return keyResource.getInputStream();
     }
 }
