@@ -4,12 +4,41 @@ const ACCESS_TOKEN_KEY = 'taskflow:accessToken'
 const EXPIRES_IN_KEY = 'taskflow:expiresIn'
 const USER_KEY = 'taskflow:user'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true' || (import.meta.env.DEV && import.meta.env.VITE_DEMO_MODE !== 'false')
+
+let demoTasks = [
+    {
+        id: 'demo-1',
+        title: 'Review frontend palette',
+        description: 'Check contrast, spacing, and the new dark motion background.',
+        completed: false,
+        createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString()
+    },
+    {
+        id: 'demo-2',
+        title: 'Validate Railway environment',
+        description: 'Confirm JWT and CORS variables before the next deploy.',
+        completed: true,
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString()
+    },
+    {
+        id: 'demo-3',
+        title: 'Polish task interactions',
+        description: 'Try create, edit, complete, reopen, and delete states.',
+        completed: false,
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString()
+    }
+]
 
 const api = axios.create({
     baseURL: API_URL
 })
 
 export function getAccessToken() {
+    if (DEMO_MODE) {
+        return 'demo-token'
+    }
+
     try {
         return localStorage.getItem(ACCESS_TOKEN_KEY)
     } catch {
@@ -31,6 +60,13 @@ function getDisplayNameFromEmail(email) {
 }
 
 export function getSavedUser() {
+    if (DEMO_MODE) {
+        return {
+            name: 'Demo User',
+            email: 'demo@taskflow.local'
+        }
+    }
+
     let savedUser
 
     try {
@@ -102,4 +138,59 @@ api.interceptors.response.use(
     }
 )
 
-export default api
+function createDemoResponse(data) {
+    return Promise.resolve({
+        data
+    })
+}
+
+function createDemoTask(task) {
+    return {
+        id: crypto.randomUUID(),
+        title: task.title,
+        description: task.description,
+        completed: false,
+        createdAt: new Date().toISOString()
+    }
+}
+
+const demoApi = {
+    get(url) {
+        if (url === '/task') {
+            return createDemoResponse([...demoTasks])
+        }
+
+        return createDemoResponse(null)
+    },
+
+    post(url, data) {
+        if (url === '/task') {
+            const task = createDemoTask(data)
+            demoTasks = [task, ...demoTasks]
+            return createDemoResponse(task)
+        }
+
+        return createDemoResponse({
+            accessToken: 'demo-token',
+            expiresIn: 3600
+        })
+    },
+
+    patch(url, data) {
+        const taskId = url.replace('/task/', '')
+        demoTasks = demoTasks.map(task => (
+            task.id === taskId ? { ...task, ...data } : task
+        ))
+
+        return createDemoResponse(demoTasks.find(task => task.id === taskId) || null)
+    },
+
+    delete(url) {
+        const taskId = url.replace('/task/', '')
+        demoTasks = demoTasks.filter(task => task.id !== taskId)
+
+        return createDemoResponse(null)
+    }
+}
+
+export default DEMO_MODE ? demoApi : api
