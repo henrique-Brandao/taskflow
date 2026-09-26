@@ -6,27 +6,21 @@ import com.henrique.taskflow.dto.response.LoginResponse;
 import com.henrique.taskflow.dto.response.UserResponse;
 import com.henrique.taskflow.exceptions.InvalidCredentialsException;
 import com.henrique.taskflow.exceptions.UserAlreadyExistsException;
-import com.henrique.taskflow.mapper.UserMapper;
 import com.henrique.taskflow.model.AppUser;
 import com.henrique.taskflow.repository.UserRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
+import org.mindrot.jbcrypt.BCrypt;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
-@Service
 public class AuthService {
 
-
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final UserMapper userMapper;
     private final TokenService tokenService;
 
-    public AuthService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, UserMapper userMapper, TokenService tokenService) {
+    public AuthService(UserRepository userRepository, TokenService tokenService) {
         this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.userMapper = userMapper;
         this.tokenService = tokenService;
     }
 
@@ -36,15 +30,22 @@ public class AuthService {
         if(possibleUser.isPresent()) {
             throw new UserAlreadyExistsException(registerRequest.email());
         }
-        AppUser newUser = userMapper.toEntity(registerRequest, bCryptPasswordEncoder.encode(registerRequest.password()));
-        AppUser savedUser = userRepository.save(newUser);
+        String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
+        AppUser newUser = new AppUser(
+                UUID.randomUUID().toString(),
+                registerRequest.name(),
+                registerRequest.email(),
+                hashedPassword,
+                LocalDateTime.now().toString()
+        );
+        userRepository.save(newUser);
 
-        return userMapper.toResponse(savedUser);
+        return new UserResponse(UUID.fromString(newUser.getId()), newUser.getName(), newUser.getEmail()); 
     }
 
     public LoginResponse loginUser (LoginRequest loginRequest) {
         Optional<AppUser> possibleUser = userRepository.findByEmail(loginRequest.email());
-        if (possibleUser.isEmpty() || !bCryptPasswordEncoder.matches(loginRequest.password(), possibleUser.get().getPassword())) {
+        if (possibleUser.isEmpty() || !BCrypt.checkpw(loginRequest.password(), possibleUser.get().getPassword())) {
             throw new InvalidCredentialsException();
         }
         var user = possibleUser.get();

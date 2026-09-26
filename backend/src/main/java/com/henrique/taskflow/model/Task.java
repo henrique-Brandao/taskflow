@@ -1,56 +1,46 @@
 package com.henrique.taskflow.model;
 
-import jakarta.persistence.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-@Entity
-@Table(name = "tasks")
-@EnableJpaAuditing
+@DynamoDbBean
 public class Task {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
-    private UUID id;
-
-    @Column(name = "title", nullable = false)
+    private String userId; // Partition Key
+    private String id;     // Sort Key
     private String title;
-
-    @Column(name = "description")
     private String description;
-
-    @Column(name = "completed", nullable = false, columnDefinition = "boolean default false")
     private boolean completed;
+    private String createdAt;
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    public Task() {
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private AppUser user;
-
-    public Task(UUID id, String title, String description, boolean completed, LocalDateTime createdAt, AppUser user) {
+    public Task(String userId, String id, String title, String description, boolean completed, String createdAt) {
+        this.userId = userId;
         this.id = id;
         this.title = title;
         this.description = description;
         this.completed = completed;
         this.createdAt = createdAt;
-        this.user = user;
     }
 
-    public Task() {
+    @DynamoDbPartitionKey
+    public String getUserId() {
+        return userId;
     }
 
-    public UUID getId() {
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    @DynamoDbSortKey
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -78,19 +68,11 @@ public class Task {
         this.completed = completed;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public AppUser getUser() {
-        return user;
-    }
-
-    public void setUser(AppUser user) {
-        this.user = user;
     }
 }
