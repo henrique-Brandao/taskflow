@@ -121,6 +121,9 @@ function Home({ onLogout }) {
   }
 
   async function deleteTask(id) {
+    const previousTasks = [...tasks];
+    setTasks(currentTasks => currentTasks.filter(task => task.id !== id));
+
     try {
       await api.delete(`/task/${id}`)
 
@@ -129,8 +132,8 @@ function Home({ onLogout }) {
       }
 
       setMessage('')
-      getTask()
     } catch (error) {
+      setTasks(previousTasks);
       if (error.response?.status !== 401) {
         setMessage('Could not delete task.')
       }
@@ -168,14 +171,24 @@ function Home({ onLogout }) {
   }
 
   async function toggleCompleted(id, completed) {
+    setTasks(currentTasks => 
+      currentTasks.map(task => 
+        task.id === id ? { ...task, completed: !completed } : task
+      )
+    )
+
     try {
       await api.patch(`/task/${id}`, {
         completed: !completed
       })
 
       setMessage('')
-      getTask()
     } catch (error) {
+      setTasks(currentTasks => 
+        currentTasks.map(task => 
+          task.id === id ? { ...task, completed: completed } : task
+        )
+      )
       if (error.response?.status !== 401) {
         setMessage('Could not update task status.')
       }
