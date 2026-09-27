@@ -53,6 +53,10 @@ public class TaskflowHandler implements RequestHandler<APIGatewayProxyRequestEve
         String method = request.getHttpMethod();
 
         try {
+            if ("OPTIONS".equals(method)) {
+                return createResponse(200, null);
+            }
+
             if ("/auth/register".equals(path) && "POST".equals(method)) {
                 RegisterRequest req = objectMapper.readValue(request.getBody(), RegisterRequest.class);
                 return createResponse(201, authService.registerUser(req));

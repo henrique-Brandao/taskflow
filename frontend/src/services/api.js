@@ -3,7 +3,7 @@ import axios from 'axios'
 const ACCESS_TOKEN_KEY = 'taskflow:accessToken'
 const EXPIRES_IN_KEY = 'taskflow:expiresIn'
 const USER_KEY = 'taskflow:user'
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const API_URL = 'https://eaeacjdoyg.execute-api.us-east-1.amazonaws.com'
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true' || (import.meta.env.DEV && import.meta.env.VITE_DEMO_MODE !== 'false')
 
 let demoTasks = [
