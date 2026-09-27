@@ -63,8 +63,12 @@ public class TaskflowHandler implements RequestHandler<APIGatewayProxyRequestEve
             } else if ("/auth/login".equals(path) && "POST".equals(method)) {
                 LoginRequest req = objectMapper.readValue(request.getBody(), LoginRequest.class);
                 return createResponse(200, authService.loginUser(req));
-            } else if (path.startsWith("/tasks")) {
-                String authHeader = request.getHeaders().getOrDefault("Authorization", "");
+            } else if (path.startsWith("/task")) {
+                String authHeader = request.getHeaders().get("Authorization");
+                if (authHeader == null) {
+                    authHeader = request.getHeaders().getOrDefault("authorization", "");
+                }
+                
                 if (authHeader.isEmpty() || !authHeader.startsWith("Bearer ")) {
                     return createResponse(401, Map.of("error", "Unauthorized"));
                 }
@@ -76,20 +80,20 @@ public class TaskflowHandler implements RequestHandler<APIGatewayProxyRequestEve
                     return createResponse(401, Map.of("error", "Invalid or expired token"));
                 }
 
-                if ("POST".equals(method) && "/tasks".equals(path)) {
+                if ("POST".equals(method) && "/task".equals(path)) {
                     TaskRequest req = objectMapper.readValue(request.getBody(), TaskRequest.class);
                     return createResponse(201, taskService.createTask(req, userId));
-                } else if ("GET".equals(method) && "/tasks".equals(path)) {
+                } else if ("GET".equals(method) && "/task".equals(path)) {
                     return createResponse(200, taskService.listTasks(userId));
-                } else if ("GET".equals(method) && path.matches("/tasks/.*")) {
-                    String taskId = path.substring(7);
+                } else if ("GET".equals(method) && path.matches("/task/.*")) {
+                    String taskId = path.substring(6);
                     return createResponse(200, taskService.findTaskById(taskId, userId));
-                } else if ("PUT".equals(method) && path.matches("/tasks/.*")) {
-                    String taskId = path.substring(7);
+                } else if (("PUT".equals(method) || "PATCH".equals(method)) && path.matches("/task/.*")) {
+                    String taskId = path.substring(6);
                     TaskUpdateRequest req = objectMapper.readValue(request.getBody(), TaskUpdateRequest.class);
                     return createResponse(200, taskService.updateTask(req, taskId, userId));
-                } else if ("DELETE".equals(method) && path.matches("/tasks/.*")) {
-                    String taskId = path.substring(7);
+                } else if ("DELETE".equals(method) && path.matches("/task/.*")) {
+                    String taskId = path.substring(6);
                     taskService.deleteTask(taskId, userId);
                     return createResponse(204, null);
                 }
