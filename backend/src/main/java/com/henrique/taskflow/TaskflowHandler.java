@@ -33,6 +33,7 @@ public class TaskflowHandler implements RequestHandler<APIGatewayProxyRequestEve
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
         this.objectMapper.registerModule(new ParameterNamesModule());
+        this.objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         DynamoDbClient dynamoDbClient = DynamoDbClient.create();
         DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder()
