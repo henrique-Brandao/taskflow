@@ -113,13 +113,21 @@ resource "aws_lambda_function" "taskflow_api" {
 resource "aws_apigatewayv2_api" "http_api" {
   name          = "taskflow-http-api"
   protocol_type = "HTTP"
+
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["*"]
+    allow_headers = ["*"]
+    max_age       = 300
+  }
 }
 
 resource "aws_apigatewayv2_integration" "lambda_integration" {
-  api_id           = aws_apigatewayv2_api.http_api.id
-  integration_type = "AWS_PROXY"
-  integration_uri  = aws_lambda_function.taskflow_api.invoke_arn
+  api_id             = aws_apigatewayv2_api.http_api.id
+  integration_type   = "AWS_PROXY"
+  integration_uri    = aws_lambda_function.taskflow_api.invoke_arn
   integration_method = "POST"
+  payload_format_version = "1.0"
 }
 
 resource "aws_apigatewayv2_route" "default_route" {

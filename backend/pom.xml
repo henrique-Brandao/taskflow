@@ -60,6 +60,11 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.16.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-parameter-names</artifactId>
+			<version>2.16.1</version>
+		</dependency>
 
 		<!-- JWT for Auth -->
 		<dependency>
@@ -120,6 +125,9 @@
 				<configuration>
 					<source>21</source>
 					<target>21</target>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>

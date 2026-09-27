@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.henrique.taskflow.dto.request.LoginRequest;
 import com.henrique.taskflow.dto.request.RegisterRequest;
 import com.henrique.taskflow.dto.request.TaskRequest;
@@ -31,6 +32,7 @@ public class TaskflowHandler implements RequestHandler<APIGatewayProxyRequestEve
     public TaskflowHandler() {
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
+        this.objectMapper.registerModule(new ParameterNamesModule());
 
         DynamoDbClient dynamoDbClient = DynamoDbClient.create();
         DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder()
