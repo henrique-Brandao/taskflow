@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "sa-east-1"
 }
 
 # DynamoDB Tables
@@ -99,7 +99,7 @@ resource "aws_lambda_function" "taskflow_api" {
   source_code_hash = filebase64sha256("${path.module}/../target/taskflow-0.0.1-SNAPSHOT.jar")
   
   runtime          = "java21"
-  memory_size      = 512
+  memory_size      = 1024
   timeout          = 30
 
   environment {
